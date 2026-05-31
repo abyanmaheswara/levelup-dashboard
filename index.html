@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LevelUp Elite: Gamified Self-Mastery HUD 2.0</title>
+  <!-- SEO & Metadata -->
+  <meta name="description" content="Dashboard produktivitas RPG interaktif bertema Sci-Fi Starship HUD dengan visualisasi 3D, animasi mewah, pelacakan IT, finansial, dan fokus belajar.">
+  <meta name="keywords" content="gamified, productivity, RPG, self-improvement, Three.js, GSAP, Anime.js, AOS">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- AOS Animation CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=2.0.0">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- Anime.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <!-- AOS JS CDN -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+</head>
+<body>
+
+  <!-- Three.js 3D Background Canvas -->
+  <canvas id="three-hologram-canvas"></canvas>
+
+  <!-- Animated Space Nebula Background Elements -->
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+
+  <!-- Global App Wrapper -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar glass">
+      <!-- Profile Header -->
+      <div class="profile-section">
+        <div class="avatar-container">
+          <div class="avatar-ring"></div>
+          <div class="avatar">🤖</div>
+        </div>
+        <div class="profile-info">
+          <h2 id="char-name">User Apprentice</h2>
+          <span class="title-badge">IT Initiate</span>
+        </div>
+      </div>
+
+      <!-- Level & XP Indicator -->
+      <div class="level-progress-box">
+        <div class="level-badge">
+          <span>LV</span>
+          <span id="char-level" class="level-num">1</span>
+        </div>
+        <div class="xp-bar-container">
+          <div class="xp-info">
+            <span>XP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="xp-bar-bg">
+            <div id="xp-bar-fill" class="xp-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Navigation -->
+      <nav class="nav-menu">
+        <button class="nav-btn active" data-view="dashboard" id="nav-btn-dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="quests" id="nav-btn-quests">
+          <i data-lucide="swords"></i>
+          <span>Quest Board</span>
+        </button>
+        <button class="nav-btn" data-view="codex" id="nav-btn-codex">
+          <i data-lucide="brain"></i>
+          <span>IT Codex</span>
+        </button>
+        <button class="nav-btn" data-view="arena" id="nav-btn-arena">
+          <i data-lucide="mic"></i>
+          <span>Speaker's Arena</span>
+        </button>
+        <button class="nav-btn" data-view="pocket" id="nav-btn-pocket">
+          <i data-lucide="wallet"></i>
+          <span>ZenPocket</span>
+        </button>
+        <button class="nav-btn" data-view="roadmap" id="nav-btn-roadmap">
+          <i data-lucide="map"></i>
+          <span>AI Roadmap</span>
+        </button>
+        <button class="nav-btn" data-view="focus" id="nav-btn-focus">
+          <i data-lucide="timer"></i>
+          <span>Focus Center</span>
+        </button>
+      </nav>
+
+      <!-- Streak & Clock Widget -->
+      <div class="sidebar-footer">
+        <div class="streak-indicator">
+          <i data-lucide="flame" class="streak-icon"></i>
+          <div class="streak-text">
+            <span id="streak-count">0</span> Hari Beruntun
+          </div>
+        </div>
+        <div class="live-clock" id="live-clock">16:00:00</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="dashboard-view" class="view-section active">
+        <header class="view-header">
+          <div>
+            <h1>Dashboard Karakter</h1>
+            <p class="subtitle">Pantau perkembangan status diri dan selesaikan tantangan hari ini.</p>
+          </div>
+          <div class="streak-badge-large">
+            <span class="label">Discipline Level:</span>
+            <span id="discipline-rating">Apprentice</span>
+          </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <!-- Knowledge Stat -->
+          <div class="stat-card glass" id="stat-card-knowledge" data-aos="fade-up" data-aos-delay="50">
+            <div class="stat-icon-wrapper color-knowledge">
+              <i data-lucide="book-open"></i>
+            </div>
+            <div class="stat-details">
+              <h3>Knowledge (IT)</h3>
+              <div class="stat-value" id="stat-knowledge-val">10</div>
+              <p>Meningkat saat mereview IT Codex</p>
+            </div>
+          </div>
+
+          <!-- Communication Stat -->
+          <div class="stat-card glass" id="stat-card-communication" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-icon-wrapper color-communication">
+              <i data-lucide="message-square-quote"></i>
+            </div>
+            <div class="stat-details">
+              <h3>Communication</h3>
+              <div class="stat-value" id="stat-communication-val">10</div>
+              <p>Meningkat saat berlatih di Speaker's Arena</p>
+            </div>
+          </div>
+
+          <!-- Wealth Stat -->
+          <div class="stat-card glass" id="stat-card-wealth" data-aos="fade-up" data-aos-delay="150">
+            <div class="stat-icon-wrapper color-wealth">
+              <i data-lucide="coins"></i>
+            </div>
+            <div class="stat-details">
+              <h3>Wealth Discipline</h3>
+              <div class="stat-value" id="stat-wealth-val">10</div>
+              <p>Meningkat saat mencatat di ZenPocket</p>
+            </div>
+          </div>
+
+          <!-- Discipline Stat -->
+          <div class="stat-card glass" id="stat-card-discipline" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-icon-wrapper color-discipline">
+              <i data-lucide="award"></i>
+            </div>
+            <div class="stat-details">
+              <h3>Self-Discipline</h3>
+              <div class="stat-value" id="stat-discipline-val">10</div>
+              <p>Meningkat saat menyelesaikan Daily Quests</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Layout Bottom: Summary & Quick Activity -->
+        <div class="dashboard-bottom-grid">
+          <!-- Overview & Streaks -->
+          <div class="summary-box glass" data-aos="fade-right">
+            <h2>Ringkasan Karakter</h2>
+            <div class="character-sheet">
+              <div class="char-sheet-item">
+                <span class="sheet-label">Pekerjaan / Gelar</span>
+                <span class="sheet-val" id="char-badge">IT Apprentice</span>
+              </div>
+              <div class="char-sheet-item">
+                <span class="sheet-label">Total Quests Selesai</span>
+                <span class="sheet-val" id="char-total-quests">0</span>
+              </div>
+              <div class="char-sheet-item">
+                <span class="sheet-label">Evaluasi Finansial</span>
+                <span class="sheet-val" id="char-pocket-status">Seimbang</span>
+              </div>
+              <div class="char-sheet-item">
+                <span class="sheet-label">Level Public Speaking</span>
+                <span class="sheet-val" id="char-speaker-level">Basic</span>
+              </div>
+            </div>
+            <div class="motivation-quote" id="motivation-quote">
+              "Kemenangan besar dibangun dari rentetan kemenangan kecil setiap hari."
+            </div>
+          </div>
+
+          <!-- Radar Competency Chart -->
+          <div class="radar-box glass" data-aos="fade-up" data-aos-delay="100">
+            <h2>Pemetaan Kompetensi</h2>
+            <div class="chart-container" style="position: relative; height: 230px; width: 100%; display: flex; align-items: center; justify-content: center;">
+              <canvas id="rpg-radar-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Daily Status Check -->
+          <div class="today-focus glass" data-aos="fade-left">
+            <h2>Tugas Utama Hari Ini</h2>
+            <div class="today-focus-content">
+              <div class="mini-quest-checklist" id="mini-quest-list">
+                <!-- Injected dynamically from app.js -->
+              </div>
+              <button class="action-btn primary" onclick="window.app.switchView('quests')">
+                <span>Buka Quest Board Lengkap</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. QUEST BOARD VIEW -->
+      <section id="quests-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>Quest Board</h1>
+            <p class="subtitle">Selesaikan tugas harian (Daily Quests) untuk mempertahankan streak dan dapatkan bonus XP disiplin.</p>
+          </div>
+        </header>
+
+        <div class="quests-layout-grid">
+          <!-- Left Column: Daily Quests -->
+          <div class="quests-column glass">
+            <div class="section-title-row">
+              <h2>⚔️ Quests Harian</h2>
+              <button class="icon-btn" id="btn-reset-quests" title="Reset Quest Harian">
+                <i data-lucide="refresh-cw"></i>
+              </button>
+            </div>
+            <div class="quest-list" id="daily-quest-list">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Right Column: Custom Habits & Quests Maker -->
+          <div class="quests-column glass">
+            <h2>➕ Tambah Quest Baru</h2>
+            <form id="add-quest-form" class="custom-form">
+              <div class="form-group">
+                <label for="quest-title">Nama Misi / Kebiasaan</label>
+                <input type="text" id="quest-title" required placeholder="Contoh: Push-up 10 kali atau Baca buku IT">
+              </div>
+              <div class="form-group">
+                <label for="quest-reward">Fokus Peningkatan Status</label>
+                <select id="quest-reward">
+                  <option value="knowledge">💡 Knowledge (IT)</option>
+                  <option value="communication">🎤 Communication (Public Speaking)</option>
+                  <option value="wealth">💰 Wealth (Keuangan)</option>
+                  <option value="discipline">⚡ Discipline (Kesehatan/Rutinitas)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="quest-xp">Hadiah XP</label>
+                <select id="quest-xp">
+                  <option value="10">10 XP (Sangat Mudah)</option>
+                  <option value="20" selected>20 XP (Sedang / Rutin)</option>
+                  <option value="40">40 XP (Sulit / Tantangan)</option>
+                </select>
+              </div>
+              <button type="submit" class="action-btn primary full-width">
+                <i data-lucide="plus-circle"></i>
+                <span>Masukkan ke Board</span>
+              </button>
+            </form>
+
+            <div class="streak-rewards-box">
+              <h3>🔥 Hadiah Streak</h3>
+              <p class="small-desc">Jaga streak harian kamu untuk membuka titel disiplin baru dan bonus XP global.</p>
+              <div class="streak-milestones">
+                <div class="milestone-item" id="milestone-3">
+                  <div class="circle">3</div>
+                  <span>Title: Konsisten</span>
+                </div>
+                <div class="milestone-item" id="milestone-7">
+                  <div class="circle">7</div>
+                  <span>Title: Tangguh</span>
+                </div>
+                <div class="milestone-item" id="milestone-15">
+                  <div class="circle">15</div>
+                  <span>Title: Legendaris</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. IT CODEX VIEW -->
+      <section id="codex-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>IT Codex</h1>
+            <p class="subtitle">Latih pemahaman IT kamu menggunakan Flashcard interaktif dengan metode Active Recall & Spaced Repetition.</p>
+          </div>
+          <div class="codex-stats">
+            <span class="badge knowledge" id="codex-progress-text">Paham: 0 / 16 Topik</span>
+          </div>
+        </header>
+
+        <div class="codex-layout">
+          <!-- Category Filter Tabs -->
+          <div class="codex-filters" id="codex-filters">
+            <button class="filter-tab active" data-category="all">Semua Topik</button>
+            <button class="filter-tab" data-category="basics">Dasar IT</button>
+            <button class="filter-tab" data-category="backend">Backend & DB</button>
+            <button class="filter-tab" data-category="frontend">Frontend & Web</button>
+            <button class="filter-tab" data-category="architecture">Sistem Desain</button>
+          </div>
+
+          <!-- Flashcard Deck Area -->
+          <div class="flashcard-deck-container">
+            <div class="deck-nav-btn prev" id="btn-prev-card"><i data-lucide="chevron-left"></i></div>
+            
+            <div class="flashcard-wrapper">
+              <div class="flashcard" id="active-flashcard">
+                <!-- Front Side -->
+                <div class="card-face card-front">
+                  <div class="card-category" id="card-cat-badge">CATEGORIES</div>
+                  <div class="card-question" id="card-question-text">
+                    Loading Flashcard...
+                  </div>
+                  <div class="card-instruction">
+                    <i data-lucide="pointer"></i> Klik kartu untuk melihat penjelasan
+                  </div>
+                </div>
+                <!-- Back Side -->
+                <div class="card-face card-back">
+                  <div class="card-answer-scroll">
+                    <h3>Penjelasan Konsep</h3>
+                    <div class="card-answer" id="card-answer-text">
+                      Loading Penjelasan...
+                    </div>
+                  </div>
+                  <div class="card-feedback-actions">
+                    <button class="feedback-btn ease" id="btn-feedback-easy">
+                      <i data-lucide="check-circle-2"></i>
+                      <span>Sudah Paham (+15 XP)</span>
+                    </button>
+                    <button class="feedback-btn hard" id="btn-feedback-hard">
+                      <i data-lucide="help-circle"></i>
+                      <span>Masih Bingung</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="deck-nav-btn next" id="btn-next-card"><i data-lucide="chevron-right"></i></div>
+          </div>
+
+          <!-- Quick Active Recall Info -->
+          <div class="codex-info-box glass">
+            <h3>💡 Cara Belajar Efektif</h3>
+            <p>1. Baca pertanyaan di bagian depan. 2. Coba jawab dan jelaskan konsepnya secara keras di kepala atau berbicara langsung. 3. Putar kartu untuk melihat jawaban yang benar. 4. Pilih <strong>"Sudah Paham"</strong> jika penjelasanmu mendekati kebenaran untuk mendapatkan XP Knowledge.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. SPEAKER'S ARENA VIEW -->
+      <section id="arena-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>Speaker's Arena</h1>
+            <p class="subtitle">Latih kelancaran berbicara (*public speaking*) menggunakan Teleprompter bergulir otomatis dan tantangan topik acak.</p>
+          </div>
+        </header>
+
+        <div class="arena-layout-grid">
+          <!-- Left Area: Teleprompter & Speech Room -->
+          <div class="arena-prompter-panel glass">
+            <!-- Settings Header -->
+            <div class="prompter-settings">
+              <div class="setting-item">
+                <label for="prompter-wpm">Kecepatan Gulir (WPM):</label>
+                <div class="slider-wrapper">
+                  <input type="range" id="prompter-wpm" min="80" max="220" value="130" step="5">
+                  <span id="prompter-wpm-val" class="badge">130 WPM</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <label for="prompter-font-size">Ukuran Teks:</label>
+                <div class="slider-wrapper">
+                  <input type="range" id="prompter-font-size" min="20" max="44" value="28">
+                  <span id="prompter-font-val" class="badge">28px</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Teleprompter Screen -->
+            <div class="prompter-screen-wrapper">
+              <div class="prompter-marker"></div>
+              <div class="prompter-screen" id="prompter-screen">
+                <div class="prompter-scroll-content" id="prompter-text-container">
+                  Tulis teks presentasi kamu di kolom sebelah kanan, atau klik "Acak Topik Bicara Spontan" untuk memulai tantangan public speaking kilat. Klik tombol Play di bawah untuk memulai perputaran teks secara otomatis.
+                </div>
+              </div>
+            </div>
+
+            <!-- Prompter Controls -->
+            <div class="prompter-controls">
+              <button class="control-btn" id="btn-prompter-reset" title="Ulangi dari awal">
+                <i data-lucide="skip-back"></i>
+              </button>
+              <button class="control-btn play-btn" id="btn-prompter-toggle">
+                <i data-lucide="play" id="prompter-play-icon"></i>
+                <span id="prompter-play-text">Mulai</span>
+              </button>
+              <div class="speech-timer" id="speech-timer">00:00</div>
+            </div>
+          </div>
+
+          <!-- Right Area: Draft & Speech Prompts -->
+          <div class="arena-draft-panel glass">
+            <div class="draft-tabs">
+              <button class="draft-tab-btn active" id="tab-custom-speech">Naskah Kustom</button>
+              <button class="draft-tab-btn" id="tab-preset-speech">Materi Bawaan</button>
+            </div>
+
+            <div class="draft-content">
+              <!-- Custom Input Mode -->
+              <div id="panel-custom-speech" class="draft-subpanel active">
+                <div class="form-group">
+                  <label for="custom-speech-input">Naskah Kamu:</label>
+                  <textarea id="custom-speech-input" placeholder="Tuliskan pidato, penjelasan materi, atau intro presentasi kamu di sini..."></textarea>
+                </div>
+                <button class="action-btn secondary full-width" id="btn-apply-custom-speech">
+                  <i data-lucide="check"></i>
+                  <span>Terapkan ke Teleprompter</span>
+                </button>
+              </div>
+
+              <!-- Preset Speeches -->
+              <div id="panel-preset-speech" class="draft-subpanel">
+                <div class="preset-speech-list">
+                  <button class="preset-item" data-speech="intro">💬 Perkenalan Diri Profesional (30 Detik)</button>
+                  <button class="preset-item" data-speech="explain-api">🔌 Menjelaskan API secara Sederhana (1 Menit)</button>
+                  <button class="preset-item" data-speech="react-pitch">⚡ Mengapa Memilih React.js (1.5 Menit)</button>
+                  <button class="preset-item" data-speech="crypto-basics">🪙 Konsep Dasar Blockchain & Crypto (2 Menit)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Impromptu Speaking Challenge -->
+            <div class="impromptu-box">
+              <h3>🎤 Tantangan Topik Spontan</h3>
+              <p class="small-desc">Uji ketangkasan bicara spontan kamu. Klik tombol di bawah dan jelaskan topik yang muncul tanpa persiapan selama 1 menit!</p>
+              <div class="prompt-box-display" id="random-prompt-display">
+                Klik tombol di bawah untuk membangkitkan tantangan topik acak.
+              </div>
+              <button class="action-btn primary full-width" id="btn-generate-prompt">
+                <i data-lucide="sparkles"></i>
+                <span>Acak Topik Bicara Spontan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. ZENPOCKET VIEW -->
+      <section id="pocket-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>ZenPocket</h1>
+            <p class="subtitle">Manajemen Keuangan Sederhana Menggunakan Metode Kantong Alokasi 50/30/20.</p>
+          </div>
+          <div class="pocket-balance-total">
+            <span class="label">Total Saldo Terencana:</span>
+            <span class="amount" id="total-balance-text">Rp 0</span>
+          </div>
+        </header>
+
+        <div class="pocket-layout-grid">
+          <!-- Left Column: Pocket Visualizers & Sliders -->
+          <div class="pocket-column glass">
+            <h2>💰 Pengaturan Kantong Alokasi</h2>
+            <div class="income-setup-box">
+              <div class="form-group inline-group">
+                <label for="monthly-income-input">Target Anggaran Bulanan:</label>
+                <div class="input-prefix-wrapper">
+                  <span class="prefix">Rp</span>
+                  <input type="number" id="monthly-income-input" value="3000000" step="50000" min="100000">
+                </div>
+              </div>
+            </div>
+
+            <!-- Pockets Grid -->
+            <div class="pockets-grid">
+              <!-- Needs Pocket (50%) -->
+              <div class="pocket-card color-needs" data-aos="fade-up" data-aos-delay="50">
+                <div class="pocket-header">
+                  <h3>🏠 Kebutuhan (Needs)</h3>
+                  <span class="percentage-badge">50%</span>
+                </div>
+                <div class="pocket-balance-indicator">
+                  <span class="current" id="pocket-needs-current">Rp 0</span>
+                  <span class="divider">/</span>
+                  <span class="limit" id="pocket-needs-limit">Rp 1.500.000</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="pocket-needs-fill" style="width: 0%"></div>
+                </div>
+                <p class="pocket-desc">Makan, kost, tagihan listrik, internet, transportasi dasar.</p>
+              </div>
+
+              <!-- Wants Pocket (30%) -->
+              <div class="pocket-card color-wants" data-aos="fade-up" data-aos-delay="100">
+                <div class="pocket-header">
+                  <h3>🎮 Keinginan (Wants)</h3>
+                  <span class="percentage-badge">30%</span>
+                </div>
+                <div class="pocket-balance-indicator">
+                  <span class="current" id="pocket-wants-current">Rp 0</span>
+                  <span class="divider">/</span>
+                  <span class="limit" id="pocket-wants-limit">Rp 900.000</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="pocket-wants-fill" style="width: 0%"></div>
+                </div>
+                <p class="pocket-desc">Kopi kekinian, bioskop, langganan game, pakaian non-darurat.</p>
+              </div>
+
+              <!-- Savings Pocket (20%) -->
+              <div class="pocket-card color-savings" data-aos="fade-up" data-aos-delay="150">
+                <div class="pocket-header">
+                  <h3>📈 Tabungan (Savings)</h3>
+                  <span class="percentage-badge">20%</span>
+                </div>
+                <div class="pocket-balance-indicator">
+                  <span class="current" id="pocket-savings-current">Rp 0</span>
+                  <span class="divider">/</span>
+                  <span class="limit" id="pocket-savings-limit">Rp 600.000</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="pocket-savings-fill" style="width: 0%"></div>
+                </div>
+                <p class="pocket-desc">Dana darurat, tabungan investasi belajar, persiapan masa depan.</p>
+              </div>
+            </div>
+
+            <!-- Savings Goal Progress Visualizer -->
+            <div class="savings-goal-vault" data-aos="fade-up">
+              <h3>🛡️ Benteng Keamanan Finansial (Tabungan Belajar)</h3>
+              <div class="vault-graphic-container">
+                <div class="vault-fill" id="vault-graphic-fill" style="height: 0%"></div>
+                <div class="vault-text" id="vault-graphic-text">0% Terisi</div>
+              </div>
+              <p class="small-desc">Mencerminkan dana yang berhasil dialokasikan ke tabungan untuk memperkuat benteng finansialmu!</p>
+            </div>
+          </div>
+
+          <!-- Right Column: Quick Transaction Logger & Ledger -->
+          <div class="pocket-column glass">
+            <h2>💸 Catat Pengeluaran Cepat</h2>
+            <form id="add-transaction-form" class="custom-form">
+              <div class="form-group">
+                <label for="tx-desc">Deskripsi Pengeluaran</label>
+                <input type="text" id="tx-desc" required placeholder="Contoh: Makan siang nasi padang atau Beli kopi">
+              </div>
+              <div class="form-group">
+                <label for="tx-amount">Nominal Pengeluaran</label>
+                <div class="input-prefix-wrapper">
+                  <span class="prefix">Rp</span>
+                  <input type="number" id="tx-amount" required min="500" step="500" placeholder="0">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="tx-category">Pilih Kantong Sumber</label>
+                <select id="tx-category">
+                  <option value="needs">🏠 Kebutuhan (Needs)</option>
+                  <option value="wants">🎮 Keinginan (Wants)</option>
+                  <option value="savings">📈 Tabungan & Investasi (Savings)</option>
+                </select>
+              </div>
+              <button type="submit" class="action-btn primary full-width">
+                <i data-lucide="check-circle"></i>
+                <span>Catat & Kurangi Saldo (+25 XP)</span>
+              </button>
+            </form>
+
+            <!-- Doughnut Chart for Spent Categories -->
+            <div class="pocket-chart-box glass" style="margin: 20px 0; padding: 20px;" data-aos="fade-up">
+              <h3 style="font-size: 14px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 0.5px;">📊 Distribusi Pengeluaran Nyata</h3>
+              <div style="height: 160px; position: relative;">
+                <canvas id="expense-pie-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="transaction-history" data-aos="fade-up">
+              <div class="section-title-row">
+                <h3>📜 Catatan Transaksi Bulan Ini</h3>
+                <button class="text-btn-danger" id="btn-clear-ledger">Hapus Semua</button>
+              </div>
+              <div class="ledger-list" id="ledger-list">
+                <div class="empty-ledger">Belum ada pengeluaran dicatat bulan ini.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. AI ROADMAP VIEW -->
+      <section id="roadmap-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>AI Engineering Roadmap</h1>
+            <p class="subtitle">Peta Jalan Belajar Mandiri 12 Minggu & Progress Tracker Interaktif.</p>
+          </div>
+          <div class="roadmap-stats-header">
+            <span class="badge knowledge" id="roadmap-progress-stats">0 / 40 Topik Selesai</span>
+          </div>
+        </header>
+
+        <div class="roadmap-layout">
+          <!-- Overall Progress Card -->
+          <div class="roadmap-progress-card glass" data-aos="fade-down">
+            <div class="progress-info-row">
+              <h3>🚀 Progress Belajar AI Kamu</h3>
+              <span class="percent" id="roadmap-progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg-large">
+              <div class="progress-bar-fill-large" id="roadmap-progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="small-desc">Setiap sub-topik yang kamu selesaikan akan memberikan tambahan XP dan Knowledge Point secara permanen!</p>
+          </div>
+
+          <!-- Free Bootcamps & Certifications Section -->
+          <div class="bootcamp-section" data-aos="fade-up">
+            <h2>🎓 Bootcamp & Sertifikasi AI Gratis (Portfolio Boost)</h2>
+            <p class="small-desc" style="margin-bottom: 16px;">Rekomendasi program pelatihan terkemuka di dunia yang 100% gratis untuk mendapatkan sertifikat resmi dan proyek portofolio siap kerja.</p>
+            
+            <div class="bootcamp-grid">
+              <!-- Bootcamp 1 -->
+              <div class="bootcamp-card glass" data-aos="zoom-in" data-aos-delay="50">
+                <div class="bootcamp-header">
+                  <span class="badge color-knowledge">Kaggle Learn</span>
+                  <h3>Python & ML Micro-Courses</h3>
+                </div>
+                <p>Platform kompetisi data sains terbesar di dunia. Menyediakan mini-bootcamp interaktif (koding langsung di browser) lengkap dengan sertifikat resmi gratis.</p>
+                <a href="https://www.kaggle.com/learn" target="_blank" class="bootcamp-link">
+                  <span>Mulai Belajar</span> <i data-lucide="external-link"></i>
+                </a>
+              </div>
+              
+              <!-- Bootcamp 2 -->
+              <div class="bootcamp-card glass" data-aos="zoom-in" data-aos-delay="100">
+                <div class="bootcamp-header">
+                  <span class="badge color-wealth">FreeCodeCamp</span>
+                  <h3>Machine Learning Certification</h3>
+                </div>
+                <p>Program pembelajaran koding gratis terpopuler. Menyertakan kurikulum machine learning dengan 5 proyek portofolio nyata yang bisa dipamerkan di GitHub kamu.</p>
+                <a href="https://www.freecodecamp.org/learn/machine-learning-with-python/" target="_blank" class="bootcamp-link">
+                  <span>Mulai Belajar</span> <i data-lucide="external-link"></i>
+                </a>
+              </div>
+
+              <!-- Bootcamp 3 -->
+              <div class="bootcamp-card glass" data-aos="zoom-in" data-aos-delay="150">
+                <div class="bootcamp-header">
+                  <span class="badge color-communication">Harvard CS50 AI</span>
+                  <h3>CS50's Introduction to AI</h3>
+                </div>
+                <p>Mata kuliah kecerdasan buatan kelas dunia dari Universitas Harvard secara gratis. Mempelajari konsep algoritma pencarian, probabilitas, dan NLP secara akademis.</p>
+                <a href="https://cs50.harvard.edu/ai/" target="_blank" class="bootcamp-link">
+                  <span>Mulai Belajar</span> <i data-lucide="external-link"></i>
+                </a>
+              </div>
+
+              <!-- Bootcamp 4 -->
+              <div class="bootcamp-card glass" data-aos="zoom-in" data-aos-delay="200">
+                <div class="bootcamp-header">
+                  <span class="badge color-discipline">Fast.ai</span>
+                  <h3>Practical Deep Learning for Coders</h3>
+                </div>
+                <p>Bootcamp berbasis praktik langsung. Mengajarkan cara melatih dan memasang model neural networks (CNN & Transformers) dari atas ke bawah (tanpa matematika rumit).</p>
+                <a href="https://course.fast.ai/" target="_blank" class="bootcamp-link">
+                  <span>Mulai Belajar</span> <i data-lucide="external-link"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-Time Search Bar -->
+          <div class="roadmap-search-box glass" data-aos="fade-up" data-aos-delay="100">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="roadmap-search-input" placeholder="Cari topik AI (misal: 'RAG', 'Llama', 'Embeddings', 'MCP', 'Agent')...">
+            <button class="clear-search-btn" id="btn-clear-roadmap-search" style="display: none;">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+
+          <!-- Cybernetic Flowchart Tree (roadmap.sh style) -->
+          <div class="roadmap-flowchart-wrapper" data-aos="fade-up" data-aos-delay="150">
+            <div class="roadmap-flowchart" id="roadmap-flowchart-tree">
+              <!-- Injected dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. FOCUS CENTER VIEW -->
+      <section id="focus-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>Focus Center</h1>
+            <p class="subtitle">Tingkatkan fokus belajarmu dengan Teknik Pomodoro dan suara latar ambient yang menenangkan.</p>
+          </div>
+        </header>
+
+        <div class="focus-layout-grid">
+          <!-- Left Panel: Pomodoro Timer Visualizer -->
+          <div class="focus-timer-panel glass" data-aos="fade-right">
+            <div class="focus-modes">
+              <button class="focus-mode-btn active" data-minutes="25">⏱️ 25 Min (Focus)</button>
+              <button class="focus-mode-btn" data-minutes="5">☕ 5 Min (Break)</button>
+              <button class="focus-mode-btn" data-minutes="15">🌴 15 Min (Long Break)</button>
+            </div>
+
+            <div class="focus-timer-container">
+              <div class="focus-timer-glow-orb"></div>
+              <svg class="focus-ring" width="260" height="260" viewBox="0 0 260 260">
+                <circle class="focus-ring-bg" cx="130" cy="130" r="110"></circle>
+                <circle class="focus-ring-dotted" cx="130" cy="130" r="120"></circle>
+                <circle class="focus-ring-progress" id="focus-circle-progress" cx="130" cy="130" r="110"></circle>
+              </svg>
+              <div class="focus-time-display" id="focus-timer-text">25:00</div>
+            </div>
+
+            <div class="focus-controls">
+              <button class="control-btn" id="btn-focus-reset" title="Ulangi Timer">
+                <i data-lucide="skip-back"></i>
+              </button>
+              <button class="control-btn play-btn" id="btn-focus-toggle">
+                <i data-lucide="play" id="focus-play-icon"></i>
+                <span id="focus-play-text">Mulai Fokus</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Panel: Synthesized Ambient Noise Controller -->
+          <div class="focus-ambient-panel glass" data-aos="fade-left">
+            <h2>🎵 Ambient Audio Generator</h2>
+            <p class="small-desc" style="margin-bottom: 20px;">Suara latar belakang yang disintesis secara dinamis langsung oleh browser Anda untuk menyaring kebisingan sekitar.</p>
+            
+            <div class="ambient-sounds-list">
+              <!-- Sound Card 1 -->
+              <button class="ambient-btn" data-sound="rain">
+                <div class="btn-sound-icon">🌧️</div>
+                <div class="btn-sound-info">
+                  <h4>Gentle Rain</h4>
+                  <p>Synthesized Pink Noise</p>
+                </div>
+                <div class="sound-wave-anim">
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                </div>
+              </button>
+              
+              <!-- Sound Card 2 -->
+              <button class="ambient-btn" data-sound="hum">
+                <div class="btn-sound-icon">🚀</div>
+                <div class="btn-sound-info">
+                  <h4>Deep Space Hum</h4>
+                  <p>Modulated Lowpass Wave</p>
+                </div>
+                <div class="sound-wave-anim">
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                  <div class="sound-wave-bar"></div>
+                </div>
+              </button>
+
+              <!-- Sound Card 3 -->
+              <button class="ambient-btn playing" data-sound="none">
+                <div class="btn-sound-icon">🔇</div>
+                <div class="btn-sound-info">
+                  <h4>Hening</h4>
+                  <p>Matikan Suara</p>
+                </div>
+              </button>
+            </div>
+
+            <div class="focus-tips-box">
+              <h3>💡 Tips Fokus Pomodoro</h3>
+              <p>Teknik Pomodoro membagi tugas besar menjadi interval 25 menit diselingi istirahat pendek. Cara ini melatih fokus penuh otak Anda tanpa membuatnya lelah parah. Gunakan suara ambient untuk menenangkan pikiran dari gangguan.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FLOATING TOAST CONTAINER FOR STATS / XP INJECTIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- LEVEL UP CONGRATULATIONS MODAL OVERLAY -->
+  <div class="modal-overlay" id="levelup-modal">
+    <div class="modal-content glass animate-levelup">
+      <div class="level-glow"></div>
+      <div class="levelup-icon">🏆</div>
+      <h2>LEVEL UP!</h2>
+      <p class="subtitle">Disiplinmu berbuah manis, tingkat karakter meningkat!</p>
+      
+      <div class="levelup-details">
+        <div class="levelup-row">
+          <span class="label">Level Sebelumnya:</span>
+          <span class="value" id="modal-prev-lvl">1</span>
+        </div>
+        <div class="levelup-row">
+          <span class="label">Level Baru:</span>
+          <span class="value highlight" id="modal-new-lvl">2</span>
+        </div>
+      </div>
+      
+      <div class="stat-boost-celebration">
+        <p>Seluruh status dasar meningkat secara permanen!</p>
+      </div>
+
+      <button class="action-btn primary animate-pulse" id="btn-close-levelup">
+        <span>Lanjutkan Perjuangan!</span>
+        <i data-lucide="swords"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- HUD SLIDING DRAWER FOR ROADMAP DETAILS -->
+  <div class="hud-drawer-overlay" id="roadmap-drawer-overlay"></div>
+  <div class="hud-drawer glass" id="roadmap-info-drawer">
+    <button class="hud-drawer-close" id="btn-close-hud-drawer" title="Tutup Detail">
+      <i data-lucide="x"></i>
+    </button>
+    <div class="hud-drawer-glow"></div>
+    <div class="hud-drawer-content">
+      <div class="drawer-header">
+        <span class="drawer-category-badge" id="drawer-topic-category">CATEGORY</span>
+        <h2 id="drawer-topic-title">Nama Topik AI</h2>
+      </div>
+      <div class="drawer-body">
+        <section class="drawer-section">
+          <h3><i data-lucide="info"></i> Deskripsi Konsep</h3>
+          <p id="drawer-topic-desc">Memuat penjelasan...</p>
+        </section>
+        <section class="drawer-section">
+          <h3><i data-lucide="terminal"></i> Contoh Praktis / Prompt</h3>
+          <pre class="drawer-code-block"><code id="drawer-topic-code">// Contoh kode pemrograman</code></pre>
+        </section>
+        <section class="drawer-section">
+          <h3><i data-lucide="link"></i> Referensi Belajar</h3>
+          <a href="#" target="_blank" class="drawer-learn-link" id="drawer-topic-link">
+            <span>Dokumentasi Resmi / Materi</span> <i data-lucide="external-link"></i>
+          </a>
+        </section>
+      </div>
+      <div class="drawer-footer">
+        <button class="action-btn primary full-width" id="btn-drawer-toggle-complete">
+          <i data-lucide="check-circle"></i>
+          <span id="drawer-toggle-complete-text">Tandai Selesai (+15 XP)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP LOGIC SCRIPTS -->
+  <script src="app.js?v=2.0.0"></script>
+  <script>
+    // Initialize Lucide Icons initially once DOM loads
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
