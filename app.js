@@ -343,6 +343,12 @@ class LevelUpMasterEngine {
       currentAmbientType: "none"
     };
 
+    this.portfolio = {
+      activeProject: null,
+      completedProjects: [],
+      completedProjectQuests: []
+    };
+
     // --- AUDIO CONTEXT ---
     this.audioCtx = null;
     this.radarChart = null;
@@ -369,6 +375,7 @@ class LevelUpMasterEngine {
     this.initPocket();
     this.initRoadmap();
     this.initFocus();
+    this.initPortfolio();
 
     this.initNavigation();
     this.updateUI();
@@ -422,6 +429,22 @@ class LevelUpMasterEngine {
     if (savedQuests) {
       try { this.quests.list = JSON.parse(savedQuests); } catch(e){}
     }
+
+    // Portfolio Modul
+    const savedActiveProj = localStorage.getItem("levelup_portfolio_active_2_0");
+    if (savedActiveProj) {
+      try { this.portfolio.activeProject = JSON.parse(savedActiveProj); } catch(e){}
+    }
+
+    const savedCompletedProjs = localStorage.getItem("levelup_portfolio_completed_2_0");
+    if (savedCompletedProjs) {
+      try { this.portfolio.completedProjects = JSON.parse(savedCompletedProjs); } catch(e){}
+    }
+
+    const savedCompletedQuests = localStorage.getItem("levelup_portfolio_completed_quests_2_0");
+    if (savedCompletedQuests) {
+      try { this.portfolio.completedProjectQuests = JSON.parse(savedCompletedQuests); } catch(e){}
+    }
   }
 
   saveState() {
@@ -431,6 +454,9 @@ class LevelUpMasterEngine {
     localStorage.setItem("levelup_pocket_income_2_0", this.pocket.income);
     localStorage.setItem("levelup_pocket_ledger_2_0", JSON.stringify(this.pocket.ledger));
     localStorage.setItem("levelup_quests_list_2_0", JSON.stringify(this.quests.list));
+    localStorage.setItem("levelup_portfolio_active_2_0", JSON.stringify(this.portfolio.activeProject));
+    localStorage.setItem("levelup_portfolio_completed_2_0", JSON.stringify(this.portfolio.completedProjects));
+    localStorage.setItem("levelup_portfolio_completed_quests_2_0", JSON.stringify(this.portfolio.completedProjectQuests));
   }
 
   // --- AUDIO SYNTHESIZER ---
@@ -734,9 +760,9 @@ class LevelUpMasterEngine {
 
     // 3. GSAP Stagger Entrance animations
     if (window.gsap) {
-      window.gsap.killTweensOf(`#${viewName}-view .glass, #${viewName}-view .stat-card, #${viewName}-view .bootcamp-card, #${viewName}-view .pocket-card`);
+      window.gsap.killTweensOf(`#${viewName}-view .glass, #${viewName}-view .stat-card, #${viewName}-view .bootcamp-card, #${viewName}-view .pocket-card, #${viewName}-view .portfolio-column`);
       window.gsap.fromTo(
-        `#${viewName}-view .glass, #${viewName}-view .stat-card, #${viewName}-view .bootcamp-card, #${viewName}-view .pocket-card`,
+        `#${viewName}-view .glass, #${viewName}-view .stat-card, #${viewName}-view .bootcamp-card, #${viewName}-view .pocket-card, #${viewName}-view .portfolio-column`,
         { y: 22, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.5, stagger: 0.04, ease: "back.out(1.35)", clearProps: "transform,opacity" }
       );
@@ -769,6 +795,9 @@ class LevelUpMasterEngine {
     }
     else if (viewName === "focus") {
       this.updateFocusTimerDisplay();
+    }
+    else if (viewName === "portfolio") {
+      this.renderPortfolioUI();
     }
   }
 
@@ -2249,6 +2278,489 @@ class LevelUpMasterEngine {
         gain.disconnect();
       }
     };
+  }
+
+  }
+
+  // --- F. PORTFOLIO CREATOR (PORTO GENERATOR & TRACKER) ---
+  initPortfolio() {
+    const generatorForm = document.getElementById("portfolio-generator-form");
+    if (generatorForm) {
+      generatorForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const category = document.getElementById("proto-category").value;
+        const difficulty = document.getElementById("proto-difficulty").value;
+        const stack = document.getElementById("proto-stack").value;
+        this.generatePortfolioProject(category, difficulty, stack);
+        this.playSynthSound("success");
+      });
+    }
+  }
+
+  generatePortfolioProject(category, difficulty, stack) {
+    // Bank of handcrafted premium blueprints
+    const handcrafted = {
+      "fullstack_hard_nextjs": {
+        title: "Aegis Cloud Vault",
+        category: "fullstack",
+        categoryName: "Fullstack Web Application",
+        difficulty: "hard",
+        xpReward: 250,
+        stack: "nextjs",
+        stackName: "Next.js App Router",
+        concept: "Portal brankas penyimpanan berkas berbasis awan aman dengan enkripsi client-side AES-GCM 256-bit, sinkronisasi Supabase realtime, dan antarmuka HUD Glassmorphism premium.",
+        cliCommand: "npx create-next-app@latest aegis-vault --typescript --tailwind --app",
+        folderTree: `aegis-vault/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── encrypt/route.ts
+│   │   ├── dashboard/page.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── FileUpload.tsx
+│   │   └── VaultViewer.tsx
+│   ├── lib/
+│   │   └── crypt.ts
+│   └── types/
+│       └── index.ts
+├── supabase/
+│   └── migrations.sql
+└── package.json`,
+        quests: [
+          { title: "Inisialisasi Next.js + Tailwind, setup modul kriptografi WebCrypto API" },
+          { title: "Desain UI dashboard VaultViewer dengan glassmorphism & dropzone interaktif" },
+          { title: "Implementasikan enkripsi berkas lokal sebelum diunggah ke storage" },
+          { title: "Konfigurasi Supabase Storage dan tabel berkas untuk metadata terenkripsi" },
+          { title: "Buat API route serverless untuk audit log pengunggahan file" },
+          { title: "Lakukan audit keamanan lokal dan deploy ke Vercel dengan domain khusus" }
+        ]
+      },
+      "ai-ml_medium_fastapi-python": {
+        title: "Zephyr Semantic Engine",
+        category: "ai-ml",
+        categoryName: "AI & Machine Learning",
+        difficulty: "medium",
+        xpReward: 120,
+        stack: "fastapi-python",
+        stackName: "FastAPI + Python",
+        concept: "Mesin pencari semantik dokumen berbasis kecerdasan buatan terpadu yang mem-parsing dokumen PDF lokal, menghasilkan vektor embedding dengan Gemini API, dan mencarinya secara real-time.",
+        cliCommand: "pip install fastapi uvicorn google-generativeai pydantic chromadb python-multipart",
+        folderTree: `zephyr-engine/
+├── app/
+│   ├── api/
+│   │   └── endpoints.py
+│   ├── services/
+│   │   ├── gemini.py
+│   │   └── vector_db.py
+│   ├── main.py
+│   └── config.py
+├── data/
+├── requirements.txt
+└── .env`,
+        quests: [
+          { title: "Setup FastAPI project, pip dependencies, dan daftarkan API Key Gemini" },
+          { title: "Bangun modul ingest berkas PDF lokal untuk parsing paragraf teks bersih" },
+          { title: "Integrasikan Google Generative AI SDK untuk generate Vektor Embedding 768-dim" },
+          { title: "Setup instance database vektor ChromaDB lokal dan simpan index embedding" },
+          { title: "Uji route POST pencarian semantik dengan latensi respons di bawah 100ms" }
+        ]
+      },
+      "frontend_easy_react-vite": {
+        title: "Vortex Weather Terminal",
+        category: "frontend",
+        categoryName: "Frontend Web App",
+        difficulty: "easy",
+        xpReward: 50,
+        stack: "react-vite",
+        stackName: "React.js + Vite",
+        concept: "Dashboard monitoring cuaca interaktif dengan tema instrumen Starship, visualisasi fluktuasi grafik suhu mingguan menggunakan Chart.js, dan fetch data API cuaca OpenWeatherMap.",
+        cliCommand: "npm create vite@latest vortex-weather -- --template react && cd vortex-weather && npm install lucide-react chart.js react-chartjs-2",
+        folderTree: `vortex-weather/
+├── src/
+│   ├── components/
+│   │   ├── RadarWidget.jsx
+│   │   ├── TemperatureChart.jsx
+│   │   └── WeatherHUD.jsx
+│   ├── App.jsx
+│   └── main.jsx
+├── index.html
+└── package.json`,
+        quests: [
+          { title: "Setup proyek React + Vite, buat styling instrumen HUD gelap bersinar di CSS" },
+          { title: "Integrasikan fetch API ke OpenWeatherMap menggunakan Custom React Hook" },
+          { title: "Desain visual widget grafik TemperatureChart.jsx menggunakan React ChartJS" },
+          { title: "Uji responsivitas layout tablet & mobile serta terapkan transisi hover tombol" }
+        ]
+      },
+      "backend_medium_nodejs-express": {
+        title: "Sentinel Health Sentinel",
+        category: "backend",
+        categoryName: "Backend & API Service",
+        difficulty: "medium",
+        xpReward: 120,
+        stack: "nodejs-express",
+        stackName: "Node.js + Express",
+        concept: "Sistem monitoring log kegagalan sensor server IoT real-time terpusat dengan otentikasi JWT, Winston logging terstruktur, dan validasi data tangguh menggunakan Express Validator.",
+        cliCommand: "npm init -y && npm install express dotenv cors jsonwebtoken winston express-validator",
+        folderTree: `sentinel-health/
+├── config/
+│   └── database.js
+├── middleware/
+│   ├── auth.js
+│   └── logger.js
+├── routes/
+│   └── sensors.js
+├── server.js
+└── package.json`,
+        quests: [
+          { title: "Inisiasi proyek Node.js Express, setup variabel .env dan middleware global CORS" },
+          { title: "Buat middleware auth.js menggunakan otentikasi dekripsi token JWT" },
+          { title: "Desain Winston logging terpusat ke berkas lokal logs/combined.log secara aman" },
+          { title: "Terapkan Express Validator pada endpoint POST data Sensor IoT" },
+          { title: "Uji performa API menggunakan stress-testing toolkit seperti autocannon" }
+        ]
+      },
+      "cli-utility_easy_fastapi-python": {
+        title: "Lovelace CLI Prompt Packer",
+        category: "cli-utility",
+        categoryName: "CLI & Developer Utility",
+        difficulty: "easy",
+        xpReward: 50,
+        stack: "fastapi-python",
+        stackName: "FastAPI + Python",
+        concept: "Aplikasi CLI Python mandiri untuk mengemas seluruh berkas repositori kode lokal menjadi satu berkas markdown terstruktur yang siap dimasukkan ke prompt LLM.",
+        cliCommand: "pip install click colorama fnmatch",
+        folderTree: `lovelace-packer/
+├── packer.py
+├── utils.py
+├── .gitignore
+└── README.md`,
+        quests: [
+          { title: "Setup file packer.py dan click CLI library untuk parser argumen argsv" },
+          { title: "Buat algoritma filter cerdas mengabaikan folder .git, node_modules, dan venv" },
+          { title: "Buat generator berkas keluaran Markdown dengan struktur tree teks visual" },
+          { title: "Kemas CLI agar dapat dieksekusi dengan perintah instan 'pack-code' di terminal" }
+        ]
+      }
+    };
+
+    const key = `${category}_${difficulty}_${stack}`;
+    let project = handcrafted[key];
+
+    if (!project) {
+      // Dynamic Procedural Generation
+      const prefixes = ["Aegis", "Vortex", "Nebula", "Sentinel", "Oracle", "Nova", "Synthetix", "Quantum", "Apex", "Prism"];
+      const suffixes = ["Vault", "Grid", "Terminal", "Engine", "Pulse", "Core", "Nexus", "Link", "Sync", "Gateway"];
+      const categoryNames = {
+        "frontend": "Frontend Web App",
+        "backend": "Backend & API Service",
+        "fullstack": "Fullstack Web Application",
+        "ai-ml": "AI & Machine Learning",
+        "cli-utility": "CLI & Developer Utility"
+      };
+      const stackNames = {
+        "react-vite": "React.js + Vite",
+        "nextjs": "Next.js App Router",
+        "nodejs-express": "Node.js + Express",
+        "fastapi-python": "FastAPI + Python",
+        "go-gin": "Golang + Gin"
+      };
+
+      const randPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      const randSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+      const generatedTitle = `${randPrefix} ${randSuffix}`;
+      const generatedName = generatedTitle.toLowerCase().replace(/\s+/g, "-");
+
+      let generatedCLI = `npm init -y`;
+      let generatedTree = `${generatedName}/\n├── src/\n│   └── main.js\n└── package.json`;
+
+      if (stack === "react-vite") {
+        generatedCLI = `npm create vite@latest ${generatedName} -- --template react`;
+        generatedTree = `${generatedName}/\n├── src/\n│   ├── components/\n│   ├── App.jsx\n│   └── main.jsx\n├── index.html\n└── package.json`;
+      } else if (stack === "nextjs") {
+        generatedCLI = `npx create-next-app@latest ${generatedName} --typescript --tailwind --app`;
+        generatedTree = `${generatedName}/\n├── src/\n│   ├── app/\n│   │   ├── page.tsx\n│   │   └── layout.tsx\n│   └── components/\n├── tsconfig.json\n└── package.json`;
+      } else if (stack === "nodejs-express") {
+        generatedCLI = `mkdir ${generatedName} && cd ${generatedName} && npm init -y && npm install express dotenv cors`;
+        generatedTree = `${generatedName}/\n├── routes/\n├── server.js\n├── .env\n└── package.json`;
+      } else if (stack === "fastapi-python") {
+        generatedCLI = `mkdir ${generatedName} && cd ${generatedName} && python -m venv venv && source venv/bin/activate && pip install fastapi uvicorn`;
+        generatedTree = `${generatedName}/\n├── app/\n│   ├── main.py\n│   └── __init__.py\n├── requirements.txt\n└── .env`;
+      } else if (stack === "go-gin") {
+        generatedCLI = `mkdir ${generatedName} && cd ${generatedName} && go mod init ${generatedName} && go get -u github.com/gin-gonic/gin`;
+        generatedTree = `${generatedName}/\n├── controllers/\n├── main.go\n├── go.mod\n└── go.sum`;
+      }
+
+      let xpReward = 120;
+      let questCount = 5;
+      if (difficulty === "easy") { xpReward = 50; questCount = 4; }
+      else if (difficulty === "hard") { xpReward = 250; questCount = 6; }
+
+      const generatedQuests = [];
+      for (let i = 1; i <= questCount; i++) {
+        generatedQuests.push({
+          title: `Langkah ${i}: Implementasikan komponen/modul inti ke-${i} dari proyek ${generatedTitle} Anda.`
+        });
+      }
+
+      project = {
+        title: generatedTitle,
+        category: category,
+        categoryName: categoryNames[category] || "Software Project",
+        difficulty: difficulty,
+        xpReward: xpReward,
+        stack: stack,
+        stackName: stackNames[stack] || stack,
+        concept: `Cetak biru proyek kustom tingkat ${difficulty} menggunakan ${stackNames[stack] || stack} untuk merancang sistem ${categoryNames[category] || category} yang tangguh, terukur, dan siap diluncurkan ke portofolio GitHub Anda.`,
+        cliCommand: generatedCLI,
+        folderTree: generatedTree,
+        quests: generatedQuests
+      };
+    }
+
+    // Set active project
+    this.portfolio.activeProject = project;
+    this.portfolio.completedProjectQuests = [];
+    
+    this.saveState();
+    this.renderPortfolioUI();
+    this.showToast("Cetak Biru Dibuat!", `Misi proyek "${project.title}" berhasil diinisialisasi!`, "xp");
+  }
+
+  renderPortfolioUI() {
+    const activePanel = document.getElementById("active-blueprint-panel");
+    const galleryContainer = document.getElementById("portfolio-gallery-list");
+    const completedBadge = document.getElementById("portfolio-completed-badge");
+
+    if (completedBadge) {
+      completedBadge.textContent = `Portofolio: ${this.portfolio.completedProjects.length} Proyek Selesai`;
+    }
+
+    // 1. Render Active Blueprint
+    if (this.portfolio.activeProject) {
+      const proj = this.portfolio.activeProject;
+      
+      let diffLabel = "Mudah";
+      let diffColor = "var(--color-wealth)";
+      if (proj.difficulty === "medium") { diffLabel = "Sedang"; diffColor = "var(--color-discipline)"; }
+      else if (proj.difficulty === "hard") { diffLabel = "Sulit"; diffColor = "var(--color-communication)"; }
+
+      let allChecked = proj.quests.length > 0 && proj.quests.every((_, idx) => this.portfolio.completedProjectQuests.includes(idx));
+
+      activePanel.innerHTML = `
+        <div class="active-blueprint-header">
+          <div class="blueprint-title-row">
+            <h3>${proj.title}</h3>
+            <span class="badge" style="background: ${diffColor}22; color: ${diffColor}; border: 1px solid ${diffColor}33; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 20px;">
+              ${diffLabel} (${proj.xpReward} XP)
+            </span>
+          </div>
+          <div class="portfolio-card-meta" style="margin-top: 8px;">
+            <span class="badge color-knowledge" style="font-size: 10px; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 242, 254, 0.25); background: rgba(0, 242, 254, 0.08);">${proj.categoryName}</span>
+            <span class="badge color-wealth" style="font-size: 10px; font-family: var(--font-code); font-weight: 700; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 255, 135, 0.25); background: rgba(0, 255, 135, 0.08);">${proj.stackName}</span>
+          </div>
+          <p class="blueprint-concept-text">${proj.concept}</p>
+        </div>
+
+        <div class="terminal-cmd-box">
+          <div class="terminal-cmd-text" id="terminal-cmd-text">${proj.cliCommand}</div>
+          <button class="btn-terminal-copy" id="btn-copy-terminal-cli" title="Salin Perintah CLI">
+            <i data-lucide="copy"></i>
+          </button>
+        </div>
+
+        <div class="folder-structure-container">
+          <h4>📂 Struktur Direktori Berkas</h4>
+          <pre class="folder-structure-code"><code>${proj.folderTree}</code></pre>
+        </div>
+
+        <div class="blueprint-quests-list-container">
+          <h4 style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 0.5px; font-weight: 700;">⚔️ Langkah Kerja & Checklist</h4>
+          <div class="blueprint-quests-list">
+            ${proj.quests.map((quest, idx) => {
+              const isDone = this.portfolio.completedProjectQuests.includes(idx);
+              return `
+                <div class="blueprint-quest-item ${isDone ? 'completed' : ''}" onclick="window.app.togglePortfolioQuest(${idx})">
+                  <div class="quest-checkbox-wrapper">
+                    <div class="quest-checkbox">
+                      <i data-lucide="check"></i>
+                    </div>
+                  </div>
+                  <span class="topic-text">${quest.title}</span>
+                  <span class="blueprint-quest-reward-ico">+10 XP</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
+        <div class="blueprint-action-banner">
+          <button class="action-btn primary full-width" id="btn-publish-portfolio" ${allChecked ? '' : 'disabled'} style="${allChecked ? '' : 'opacity: 0.45; cursor: not-allowed; background: var(--text-muted); box-shadow: none; color: var(--text-secondary);'}">
+            <i data-lucide="rocket"></i>
+            <span>Selesaikan & Masukkan ke Portofolio!</span>
+          </button>
+        </div>
+      `;
+
+      // Setup clipboard click
+      const copyBtn = document.getElementById("btn-copy-terminal-cli");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.copyCommandLine(proj.cliCommand);
+        });
+      }
+
+      // Setup publish click
+      const publishBtn = document.getElementById("btn-publish-portfolio");
+      if (publishBtn && allChecked) {
+        publishBtn.addEventListener("click", () => {
+          this.completePortfolioProject();
+        });
+      }
+
+    } else {
+      activePanel.innerHTML = `
+        <div class="empty-blueprint-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; height: 100%; min-height: 350px;">
+          <i data-lucide="blueprint" class="empty-blueprint-icon" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Belum Ada Cetak Biru Aktif</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); max-width: 280px; line-height: 1.5;">Pilih kategori, tingkat kesulitan, dan tech stack di sebelah kiri untuk menghasilkan cetak biru proyek pertamamu secara otomatis!</p>
+        </div>
+      `;
+    }
+
+    // 2. Render Completed Portfolios Gallery
+    if (this.portfolio.completedProjects.length > 0) {
+      galleryContainer.innerHTML = this.portfolio.completedProjects.map((p, idx) => {
+        let diffLabel = "Easy";
+        let diffColor = "var(--color-wealth)";
+        if (p.difficulty === "medium") { diffLabel = "Medium"; diffColor = "var(--color-discipline)"; }
+        else if (p.difficulty === "hard") { diffLabel = "Hard"; diffColor = "var(--color-communication)"; }
+
+        return `
+          <div class="portfolio-gallery-card" style="position: relative;">
+            <div class="portfolio-card-header">
+              <h4 style="margin: 0;">${p.title}</h4>
+              <span class="badge" style="background: ${diffColor}22; color: ${diffColor}; font-size: 9px; padding: 1px 6px; border: 1px solid ${diffColor}33; font-weight: 700; border-radius: 10px;">
+                ${diffLabel}
+              </span>
+            </div>
+            <div class="portfolio-card-meta">
+              <span class="badge color-knowledge" style="font-size: 9px; padding: 1px 6px; border-radius: 10px; border: 1px solid rgba(0, 242, 254, 0.15); background: rgba(0, 242, 254, 0.05); font-weight: 600;">${p.categoryName}</span>
+              <span class="badge color-wealth" style="font-size: 9px; padding: 1px 6px; font-family: var(--font-code); border-radius: 10px; border: 1px solid rgba(0, 255, 135, 0.15); background: rgba(0, 255, 135, 0.05); font-weight: 600;">${p.stackName}</span>
+            </div>
+            <p class="portfolio-card-desc">${p.concept}</p>
+            <div class="portfolio-card-links">
+              ${p.githubLink ? `
+                <a href="${p.githubLink}" target="_blank" class="portfolio-card-link">
+                  <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+                  <span>Live Demo / Code</span>
+                </a>
+              ` : `
+                <span class="portfolio-card-link" style="color: var(--text-muted); cursor: not-allowed;">
+                  <i data-lucide="link" style="width: 12px; height: 12px;"></i>
+                  <span>No Link Provided</span>
+                </span>
+              `}
+              <span class="portfolio-card-link" style="color: var(--color-success); margin-left: auto; font-weight: 700;">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>Tersimpan</span>
+              </span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } else {
+      galleryContainer.innerHTML = `
+        <div class="empty-gallery">Belum ada proyek portofolio yang diselesaikan. Selesaikan cetak biru pertamamu untuk meluncurkannya di sini!</div>
+      `;
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  togglePortfolioQuest(idx) {
+    if (!this.portfolio.activeProject) return;
+    
+    const foundIdx = this.portfolio.completedProjectQuests.indexOf(idx);
+    
+    if (foundIdx === -1) {
+      // Complete quest!
+      this.portfolio.completedProjectQuests.push(idx);
+      
+      // Award mini rewards: +10 XP & +1 status
+      let statAward = "discipline";
+      if (idx % 2 === 0) statAward = "knowledge";
+      this.addXP(10, statAward);
+      
+      if (window.confetti) {
+        window.confetti({ particleCount: 20, spread: 30, origin: { y: 0.85 } });
+      }
+    } else {
+      // Uncomplete quest
+      this.portfolio.completedProjectQuests.splice(foundIdx, 1);
+      this.showToast("Tugas Dibatalkan", "Kemajuan langkah kerja ditarik kembali.", "fail");
+      this.playSynthSound("fail");
+    }
+
+    this.saveState();
+    this.renderPortfolioUI();
+    this.updateUI();
+  }
+
+  completePortfolioProject() {
+    if (!this.portfolio.activeProject) return;
+
+    let githubLink = prompt("Masukkan Link URL Repository GitHub / Demo Live Proyek Anda (Opsional):", "https://github.com/username/" + this.portfolio.activeProject.title.toLowerCase().replace(/\s+/g, "-"));
+    if (githubLink === null) return; // user cancelled prompt
+
+    const completedProj = {
+      ...this.portfolio.activeProject,
+      githubLink: githubLink || "",
+      completedDate: new Date().toLocaleDateString()
+    };
+
+    // Add to completed
+    this.portfolio.completedProjects.unshift(completedProj);
+    
+    // Give massive reward!
+    const rewardXP = this.portfolio.activeProject.xpReward;
+    this.state.totalQuests += 1;
+    
+    // Confetti blast
+    if (window.confetti) {
+      window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
+    // Award XP and stats
+    this.addXP(rewardXP, "discipline");
+    this.state.stats.knowledge += 2;
+    if (completedProj.category === "fullstack") {
+      this.state.stats.wealth += 2;
+    } else {
+      this.state.stats.communication += 2;
+    }
+
+    this.showToast("🎯 PROYEK SELESAI!", `Proyek "${completedProj.title}" resmi ditambahkan ke Portofolio!`, "success");
+    
+    // Reset active
+    this.portfolio.activeProject = null;
+    this.portfolio.completedProjectQuests = [];
+
+    this.saveState();
+    this.renderPortfolioUI();
+    this.updateUI();
+  }
+
+  copyCommandLine(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast("Berhasil Disalin!", "Perintah CLI inisialisasi berhasil disalin ke clipboard.", "xp");
+      this.playSynthSound("click");
+    }).catch(err => {
+      console.error("Gagal menyalin", err);
+      this.showToast("Gagal Menyalin", "Peramban melarang akses clipboard.", "fail");
+    });
   }
 
   // --- GENERAL HELPER ---

@@ -104,6 +104,10 @@
           <i data-lucide="timer"></i>
           <span>Focus Center</span>
         </button>
+        <button class="nav-btn" data-view="portfolio" id="nav-btn-portfolio">
+          <i data-lucide="briefcase"></i>
+          <span>Porto Creator</span>
+        </button>
       </nav>
 
       <!-- Streak & Clock Widget -->
@@ -813,6 +817,79 @@
             <div class="focus-tips-box">
               <h3>💡 Tips Fokus Pomodoro</h3>
               <p>Teknik Pomodoro membagi tugas besar menjadi interval 25 menit diselingi istirahat pendek. Cara ini melatih fokus penuh otak Anda tanpa membuatnya lelah parah. Gunakan suara ambient untuk menenangkan pikiran dari gangguan.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. PORTFOLIO CREATOR VIEW -->
+      <section id="portfolio-view" class="view-section">
+        <header class="view-header">
+          <div>
+            <h1>Porto Creator</h1>
+            <p class="subtitle">Rancang proyek portofolio nyata dengan cetak biru arsitektur, perintah CLI otomatis, dan checklist implementasi gamified.</p>
+          </div>
+          <div class="portfolio-stats-header">
+            <span class="badge color-discipline" id="portfolio-completed-badge">Portofolio: 0 Proyek Selesai</span>
+          </div>
+        </header>
+        
+        <div class="portfolio-layout-grid">
+          <!-- SISI KIRI: Generator Cetak Biru Proyek -->
+          <div class="portfolio-column glass">
+            <h2>🛠️ Generator Proyek Baru</h2>
+            <form id="portfolio-generator-form" class="custom-form">
+              <div class="form-group">
+                <label for="proto-category">Kategori Proyek</label>
+                <select id="proto-category">
+                  <option value="frontend">🎨 Frontend Web App (UI/UX fokus)</option>
+                  <option value="backend">⚡ Backend & API Service (Data/System fokus)</option>
+                  <option value="fullstack">🚀 Fullstack Web Application (Sistem Lengkap)</option>
+                  <option value="ai-ml">🤖 AI & Machine Learning Integration (LLM/Data Science)</option>
+                  <option value="cli-utility">💻 CLI Tool & Developer Utility (Automasi/Sistem)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="proto-difficulty">Tingkat Kesulitan & XP</label>
+                <select id="proto-difficulty">
+                  <option value="easy">Easy (Estimasi 2-4 jam belajar | +50 XP)</option>
+                  <option value="medium" selected>Medium (Estimasi 1-2 hari kerja | +120 XP)</option>
+                  <option value="hard">Hard (Estimasi 3-7 hari kerja | +250 XP)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="proto-stack">Tech Stack Utama</label>
+                <select id="proto-stack">
+                  <option value="react-vite">React.js + Vite (JS/TS)</option>
+                  <option value="nextjs">Next.js App Router (Fullstack TS)</option>
+                  <option value="nodejs-express">Node.js + Express (Backend)</option>
+                  <option value="fastapi-python">FastAPI + Python (AI/Backend)</option>
+                  <option value="go-gin">Golang + Gin (High Performance)</option>
+                </select>
+              </div>
+              <button type="submit" class="action-btn primary full-width" style="margin-top: 10px;">
+                <i data-lucide="sparkles"></i>
+                <span>Gulirkan Proyek Epic Baru!</span>
+              </button>
+            </form>
+
+            <!-- Etalase Proyek Selesai -->
+            <div class="completed-portfolio-showcase" style="margin-top: 30px;">
+              <h3 style="font-size: 14px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">💼 Galeri Portofolio Saya</h3>
+              <div class="portfolio-gallery-list" id="portfolio-gallery-list">
+                <!-- Diinjeksi dinamis dari JavaScript -->
+                <div class="empty-gallery">Belum ada proyek portofolio yang diselesaikan. Selesaikan cetak biru pertamamu untuk meluncurkannya di sini!</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SISI KANAN: Detail Cetak Biru Aktif (Active Blueprint HUD) -->
+          <div class="portfolio-column glass" id="active-blueprint-panel">
+            <!-- Rencana proyek aktif akan di-render di sini secara dinamis -->
+            <div class="empty-blueprint-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; height: 100%; min-height: 350px;">
+              <i data-lucide="blueprint" class="empty-blueprint-icon" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Belum Ada Cetak Biru Aktif</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); max-width: 280px; line-height: 1.5;">Pilih kategori, tingkat kesulitan, dan tech stack di sebelah kiri untuk menghasilkan cetak biru proyek pertamamu secara otomatis!</p>
             </div>
           </div>
         </div>
