@@ -2280,8 +2280,6 @@ class LevelUpMasterEngine {
     };
   }
 
-  }
-
   // --- F. PORTFOLIO CREATOR (PORTO GENERATOR & TRACKER) ---
   initPortfolio() {
     const generatorForm = document.getElementById("portfolio-generator-form");
